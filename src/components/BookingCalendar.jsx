@@ -141,7 +141,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                 if (isSelected) {
                   return (
                     <div style={{
-                      backgroundColor: '#0078FF', // Bright blue like in the image
+                      backgroundColor: '#6E58FF', // Updated to our primary color
                       color: 'white',
                       borderRadius: '50%',
                       height: rem(50),
@@ -157,7 +157,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                 
                 return (
                   <div style={{
-                    color: '#0078FF', // Bright blue like in the image
+                    color: '#6E58FF', // Updated to our primary color
                     fontWeight: 600,
                     borderRadius: '50%',
                     height: rem(40),
@@ -165,7 +165,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#EBF4FF', // Light blue background
+                    backgroundColor: '#EDE9FF', // Light shade of our primary color
                     cursor: 'pointer',
                     fontSize: rem(16)
                   }}>{day}</div>
@@ -217,7 +217,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
               }}
             >
               <Avatar
-                color="blue"
+                color="brand"
                 radius="xl"
                 size="md"
               >
@@ -247,7 +247,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                               marginBottom: '0.75rem'
                             }}
                           >
-                            <IconSun size={18} color="#F59F00" />
+                            <IconSun size={18} color="#6E58FF" />
                             <Text size="sm" fw={600} c="gray.7">Morning</Text>
                           </Box>
                           <Grid gutter="xs" mb="md">
@@ -257,23 +257,23 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                                 <Grid.Col span={6} key={slot.start}>
                                   <Button
                                     variant="outline"
-                                    color="blue"
+                                    color="brand"
                                     radius="md"
                                     style={{
                                       width: '100%',
                                       fontWeight: 500,
                                       fontSize: '0.9rem',
-                                      borderColor: 'var(--mantine-color-blue-1)',
+                                      borderColor: 'var(--mantine-color-brand-1)',
                                       transition: 'all 0.2s',
                                       padding: '8px 0',
                                     }}
                                     styles={{
                                       root: {
                                         '&:hover': {
-                                          backgroundColor: 'var(--mantine-color-blue-0)',
-                                          borderColor: 'var(--mantine-color-blue-5)',
+                                          backgroundColor: 'var(--mantine-color-brand-0)',
+                                          borderColor: 'var(--mantine-color-brand-5)',
                                           transform: 'translateY(-2px)',
-                                          boxShadow: '0 5px 15px -5px var(--mantine-color-blue-2)',
+                                          boxShadow: '0 5px 15px -5px var(--mantine-color-brand-2)',
                                         },
                                       }
                                     }}
@@ -298,7 +298,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                               marginBottom: '0.75rem'
                             }}
                           >
-                            <IconSun size={18} color="#F59F00" />
+                            <IconSun size={18} color="#6E58FF" />
                             <Text size="sm" fw={600} c="gray.7">Afternoon</Text>
                           </Box>
                           <Grid gutter="xs" mb="md">
@@ -308,23 +308,23 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                                 <Grid.Col span={6} key={slot.start}>
                                   <Button
                                     variant="outline"
-                                    color="blue"
+                                    color="brand"
                                     radius="md"
                                     style={{
                                       width: '100%',
                                       fontWeight: 500,
                                       fontSize: '0.9rem',
-                                      borderColor: 'var(--mantine-color-blue-1)',
+                                      borderColor: 'var(--mantine-color-brand-1)',
                                       transition: 'all 0.2s',
                                       padding: '8px 0',
                                     }}
                                     styles={{
                                       root: {
                                         '&:hover': {
-                                          backgroundColor: 'var(--mantine-color-blue-0)',
-                                          borderColor: 'var(--mantine-color-blue-5)',
+                                          backgroundColor: 'var(--mantine-color-brand-0)',
+                                          borderColor: 'var(--mantine-color-brand-5)',
                                           transform: 'translateY(-2px)',
-                                          boxShadow: '0 5px 15px -5px var(--mantine-color-blue-2)',
+                                          boxShadow: '0 5px 15px -5px var(--mantine-color-brand-2)',
                                         },
                                       }
                                     }}
@@ -349,7 +349,7 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                               marginBottom: '0.75rem'
                             }}
                           >
-                            <IconMoon size={18} color="#4263EB" />
+                            <IconMoon size={18} color="#6E58FF" />
                             <Text size="sm" fw={600} c="gray.7">Evening</Text>
                           </Box>
                           <Grid gutter="xs">
@@ -359,23 +359,23 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
                                 <Grid.Col span={6} key={slot.start}>
                                   <Button
                                     variant="outline"
-                                    color="blue"
+                                    color="brand"
                                     radius="md"
                                     style={{
                                       width: '100%',
                                       fontWeight: 500,
                                       fontSize: '0.9rem',
-                                      borderColor: 'var(--mantine-color-blue-1)',
+                                      borderColor: 'var(--mantine-color-brand-1)',
                                       transition: 'all 0.2s',
                                       padding: '8px 0',
                                     }}
                                     styles={{
                                       root: {
                                         '&:hover': {
-                                          backgroundColor: 'var(--mantine-color-blue-0)',
-                                          borderColor: 'var(--mantine-color-blue-5)',
+                                          backgroundColor: 'var(--mantine-color-brand-0)',
+                                          borderColor: 'var(--mantine-color-brand-5)',
                                           transform: 'translateY(-2px)',
-                                          boxShadow: '0 5px 15px -5px var(--mantine-color-blue-2)',
+                                          boxShadow: '0 5px 15px -5px var(--mantine-color-brand-2)',
                                         },
                                       }
                                     }}

@@ -83,7 +83,7 @@ const BookingPage = () => {
         <Avatar 
           size="xl" 
           radius="xl" 
-          color="blue" 
+          color="brand" 
           style={{ marginRight: 24 }}
         >
           <IconCalendarEvent size={32} />
