@@ -4,7 +4,7 @@ import { Text, Button, Paper, Stack, Grid, rem, Box, Avatar, Title, Divider, Scr
 import { format, parseISO, isSameDay, getHours } from 'date-fns';
 import { IconClock, IconCalendar, IconSun, IconMoon } from '@tabler/icons-react';
 
-const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSelectTimeSlot }) => {
+const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSelectTimeSlot, refreshSlots }) => {
   const [availableDates, setAvailableDates] = useState(new Set());
 
   useEffect(() => {
@@ -16,6 +16,13 @@ const BookingCalendar = ({ availableSlots, selectedDate, setSelectedDate, onSele
     });
     setAvailableDates(dates);
   }, [availableSlots]);
+
+  // Refresh data when requested
+  useEffect(() => {
+    if (refreshSlots) {
+      refreshSlots();
+    }
+  }, [refreshSlots]);
 
   // Filter time slots for the selected date
   const timeSlots = availableSlots.filter(slot => {

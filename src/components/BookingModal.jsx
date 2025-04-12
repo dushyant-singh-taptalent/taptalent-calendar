@@ -29,7 +29,8 @@ const BookingModal = ({
   onClose, 
   selectedTimeSlot, 
   bookingData, 
-  profileName 
+  profileName,
+  onSuccessfulBooking
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -59,31 +60,59 @@ const BookingModal = ({
       };
       
       // Call Aurinko API
-      await axios.post(
-        `${aurinkoBaseUrl}/${clientId}/${profileName}/meeting`,
-        bookingPayload,
-        {
-          headers: {
-            'Content-Type': 'application/json'
+      try {
+        await axios.post(
+          `${aurinkoBaseUrl}/${clientId}/${profileName}/meeting`,
+          bookingPayload,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
+        );
+      } catch (aurinkoError) {
+        // Handle Aurinko-specific error
+        if (aurinkoError.response && aurinkoError.response.data) {
+          const { message, code } = aurinkoError.response.data;
+          throw new Error(message || `Aurinko error: ${code}`);
         }
-      );
+        throw aurinkoError;
+      }
       
       // After successful Aurinko API call, call our backend API
-      await axios.post(
-        `${backendBaseUrl}/calendar/bookings/${profileName}`,
-        {
-          name,
-          email
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
+      try {
+        const backendResponse = await axios.post(
+          `${backendBaseUrl}/calendar/bookings/${profileName}`,
+          {
+            name,
+            email
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
+        );
+        
+        // Check if backend sends an error in the response
+        if (backendResponse.data && backendResponse.data.error) {
+          throw new Error(backendResponse.data.error);
         }
-      );
+      } catch (backendError) {
+        // Handle backend-specific error
+        if (backendError.response && backendError.response.data && backendError.response.data.error) {
+          throw new Error(backendError.response.data.error);
+        }
+        throw backendError;
+      }
       
       setBookingSuccess(true);
+      
+      // Call the onSuccessfulBooking callback if provided to refresh time slots
+      if (onSuccessfulBooking) {
+        onSuccessfulBooking();
+      }
+      
       setTimeout(() => {
         onClose();
         // Reset form
@@ -94,7 +123,7 @@ const BookingModal = ({
       
     } catch (err) {
       console.error('Error booking meeting:', err);
-      setBookingError('Failed to book meeting. Please try again.');
+      setBookingError(err.message || 'Failed to book meeting. Please try again.');
     } finally {
       setBookingLoading(false);
     }
@@ -403,29 +432,7 @@ const BookingModal = ({
                     />
                   </Stack>
                 
-                {bookingError && (
-                    <Box
-                      sx={{
-                        background: 'rgba(211, 47, 47, 0.05)',
-                        border: '1px solid rgba(211, 47, 47, 0.2)',
-                        borderRadius: '12px',
-                        p: 2,
-                        mt: 2
-                      }}
-                    >
-                      <Typography 
-                        color="error" 
-                        variant="body2" 
-                        sx={{ 
-                          fontWeight: 500,
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}
-                      >
-                    {bookingError}
-                  </Typography>
-                    </Box>
-            )}
+                {/* Error message removed from here */}
           </Stack>
         </DialogContent>
               
@@ -434,53 +441,82 @@ const BookingModal = ({
                   px: 4, 
                   pb: 4,
                   pt: 1,
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  flexDirection: 'column',
+                  alignItems: 'stretch'
                 }}
               >
-                <Button 
-                  onClick={handleClose} 
-                  disabled={bookingLoading}
-                  sx={{ 
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    color: 'rgba(0,0,0,0.6)',
-                    fontSize: '0.95rem',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                    }
-                  }}
-                >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSchedule}
-            disabled={!name || !email || bookingLoading}
-            variant="contained"
-                  disableElevation
-                  sx={{ 
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderRadius: '12px',
-                    py: 1.2,
-                    px: 3.5,
-                    background: primaryGradient,
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 6px 15px rgba(110, 88, 255, 0.4)',
+                {/* Error message added here */}
+                {bookingError && (
+                  <Box
+                    sx={{
+                      background: 'rgba(211, 47, 47, 0.05)',
+                      border: '1px solid rgba(211, 47, 47, 0.2)',
+                      borderRadius: '12px',
+                      p: 2,
+                      mb: 2,
+                      width: '100%'
+                    }}
+                  >
+                    <Typography 
+                      color="error" 
+                      variant="body2" 
+                      sx={{ 
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {bookingError}
+                    </Typography>
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                  <Button 
+                    onClick={handleClose} 
+                    disabled={bookingLoading}
+                    sx={{ 
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      color: 'rgba(0,0,0,0.6)',
+                      fontSize: '0.95rem',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleSchedule}
+                    disabled={!name || !email || bookingLoading}
+                    variant="contained"
+                    disableElevation
+                    sx={{ 
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderRadius: '12px',
+                      py: 1.2,
+                      px: 3.5,
                       background: primaryGradient,
-                      transform: 'translateY(-2px)'
-                    },
-                    '&:disabled': {
-                      opacity: 0.6,
-                      color: 'white'
-                    }
-                  }}
-                >
-                  Confirm Booking
-          </Button>
-        </DialogActions>
+                      color: 'white',
+                      fontSize: '0.95rem',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        boxShadow: '0 6px 15px rgba(110, 88, 255, 0.4)',
+                        background: primaryGradient,
+                        transform: 'translateY(-2px)'
+                      },
+                      '&:disabled': {
+                        opacity: 0.6,
+                        color: 'white'
+                      }
+                    }}
+                  >
+                    Confirm Booking
+                  </Button>
+                </Box>
+              </DialogActions>
             </>
           )}
         </>
