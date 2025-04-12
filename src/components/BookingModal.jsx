@@ -29,8 +29,7 @@ const BookingModal = ({
   onClose, 
   selectedTimeSlot, 
   bookingData, 
-  profileName,
-  onSuccessfulBooking
+  profileName 
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -85,7 +84,11 @@ const BookingModal = ({
           `${backendBaseUrl}/calendar/bookings/${profileName}`,
           {
             name,
-            email
+            email,
+            time: {
+              start: selectedTimeSlot.start,
+              end: selectedTimeSlot.end
+            }
           },
           {
             headers: {
@@ -107,12 +110,6 @@ const BookingModal = ({
       }
       
       setBookingSuccess(true);
-      
-      // Call the onSuccessfulBooking callback if provided to refresh time slots
-      if (onSuccessfulBooking) {
-        onSuccessfulBooking();
-      }
-      
       setTimeout(() => {
         onClose();
         // Reset form
