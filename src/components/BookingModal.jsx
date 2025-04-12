@@ -22,7 +22,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
-import { clientId, aurinkoBaseUrl } from '../config';
+import { clientId, aurinkoBaseUrl, backendBaseUrl } from '../config';
 
 const BookingModal = ({ 
   isOpen, 
@@ -58,9 +58,24 @@ const BookingModal = ({
         accountIds
       };
       
+      // Call Aurinko API
       await axios.post(
         `${aurinkoBaseUrl}/${clientId}/${profileName}/meeting`,
         bookingPayload,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // After successful Aurinko API call, call our backend API
+      await axios.post(
+        `${backendBaseUrl}/calendar/bookings/${profileName}`,
+        {
+          name,
+          email
+        },
         {
           headers: {
             'Content-Type': 'application/json'
@@ -97,7 +112,7 @@ const BookingModal = ({
   // CSS variables for gradient and colors
   const primaryGradient = 'linear-gradient(135deg, #6E58FF 0%, #8976FF 100%)';
   const secondaryGradient = 'linear-gradient(135deg, rgba(110, 88, 255, 0.08) 0%, rgba(137, 118, 255, 0.08) 100%)';
-  
+
   return (
     <Dialog
       open={isOpen}
@@ -150,7 +165,7 @@ const BookingModal = ({
       
       {selectedTimeSlot && (
         <>
-          {bookingSuccess ? (
+            {bookingSuccess ? (
             <Box 
               sx={{ 
                 padding: '60px 40px',
@@ -266,10 +281,10 @@ const BookingModal = ({
                           }}
                         >
                           <EventNoteIcon sx={{ color: 'white', fontSize: 20 }}/>
-                        </Box>
+              </Box>
                         <Typography variant="h6" sx={{ fontWeight: 600, color: '#2A2A2A', ml: 1 }}>
-                          {bookingData.subject}
-                        </Typography>
+                        {bookingData.subject}
+                      </Typography>
                       </Stack>
                       
                       <Divider sx={{ opacity: 0.6 }} />
@@ -279,18 +294,18 @@ const BookingModal = ({
                           <CalendarTodayIcon sx={{ color: '#6E58FF', fontSize: 18 }} />
                           <Typography sx={{ fontWeight: 500, fontSize: '0.95rem', color: 'rgba(0,0,0,0.7)' }}>
                             {format(parseISO(selectedTimeSlot.start), 'EEEE, MMMM d, yyyy')}
-                          </Typography>
+                      </Typography>
                         </Stack>
                         
                         <Stack direction="row" spacing={1.5} alignItems="center">
                           <AccessTimeIcon sx={{ color: '#6E58FF', fontSize: 18 }} />
                           <Typography sx={{ fontWeight: 500, fontSize: '0.95rem', color: 'rgba(0,0,0,0.7)' }}>
                             {format(parseISO(selectedTimeSlot.start), 'h:mm a')} • {bookingData.durationMinutes} minutes
-                          </Typography>
+                      </Typography>
                         </Stack>
                       </Stack>
                     </Stack>
-                  </Box>
+                    </Box>
                   
                   <Typography 
                     variant="subtitle1" 
@@ -302,18 +317,18 @@ const BookingModal = ({
                     }}
                   >
                     Enter your details
-                  </Typography>
-                  
+                      </Typography>
+                
                   {/* Form Fields */}
                   <Stack spacing={3}>
-                    <TextField
+                <TextField
                       label="Full Name"
-                      placeholder="Enter your name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      fullWidth
-                      required
-                      disabled={bookingLoading}
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  fullWidth
+                  required
+                  disabled={bookingLoading}
                       variant="outlined"
                       InputProps={{
                         startAdornment: (
@@ -344,17 +359,17 @@ const BookingModal = ({
                           padding: '14px 14px 14px 0',
                         }
                       }}
-                    />
-                    
-                    <TextField
-                      label="Email Address"
-                      placeholder="Enter your email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      fullWidth
-                      required
-                      disabled={bookingLoading}
+                />
+                
+                <TextField
+                  label="Email Address"
+                  placeholder="Enter your email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  fullWidth
+                  required
+                  disabled={bookingLoading}
                       variant="outlined"
                       InputProps={{
                         startAdornment: (
@@ -387,8 +402,8 @@ const BookingModal = ({
                       }}
                     />
                   </Stack>
-                  
-                  {bookingError && (
+                
+                {bookingError && (
                     <Box
                       sx={{
                         background: 'rgba(211, 47, 47, 0.05)',
@@ -407,12 +422,12 @@ const BookingModal = ({
                           alignItems: 'center'
                         }}
                       >
-                        {bookingError}
-                      </Typography>
+                    {bookingError}
+                  </Typography>
                     </Box>
-                  )}
-                </Stack>
-              </DialogContent>
+            )}
+          </Stack>
+        </DialogContent>
               
               <DialogActions 
                 sx={{ 
@@ -435,12 +450,12 @@ const BookingModal = ({
                     }
                   }}
                 >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleSchedule}
-                  disabled={!name || !email || bookingLoading}
-                  variant="contained"
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSchedule}
+            disabled={!name || !email || bookingLoading}
+            variant="contained"
                   disableElevation
                   sx={{ 
                     textTransform: 'none',
@@ -464,8 +479,8 @@ const BookingModal = ({
                   }}
                 >
                   Confirm Booking
-                </Button>
-              </DialogActions>
+          </Button>
+        </DialogActions>
             </>
           )}
         </>
@@ -474,4 +489,4 @@ const BookingModal = ({
   );
 };
 
-export default BookingModal;
+export default BookingModal; 

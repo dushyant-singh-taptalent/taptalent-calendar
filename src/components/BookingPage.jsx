@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Title, Text, Paper, LoadingOverlay, Box, Avatar } from '@mantine/core';
+import { Container, Title, Text, Paper, LoadingOverlay, Box, Avatar, Image } from '@mantine/core';
 import axios from 'axios';
 import { IconClock, IconCalendarEvent } from '@tabler/icons-react';
 import { clientId, aurinkoBaseUrl } from '../config';
@@ -76,41 +76,90 @@ const BookingPage = () => {
       py="xl" 
       style={{
         maxWidth: '1100px',
+        minHeight: 'calc(100vh - 120px)', // Leave room for footer
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* Header with meeting info */}
-      <Box mb="xl" style={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar 
-          size="xl" 
-          radius="xl" 
-          color="brand" 
-          style={{ marginRight: 24 }}
+      <Box style={{ flex: 1 }}>
+        {/* Meeting information */}
+        <Paper
+          p="xl"
+          radius="md"
+          mb="xl"
+          style={{
+            background: 'linear-gradient(135deg, rgba(110, 88, 255, 0.05) 0%, rgba(137, 118, 255, 0.08) 100%)',
+            border: '1px solid rgba(110, 88, 255, 0.1)',
+          }}
         >
-          <IconCalendarEvent size={32} />
-        </Avatar>
-        <Box>
-          <Title order={1} size="h3" style={{ marginBottom: 8 }}>{bookingData.subject}</Title>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <IconClock size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-            <Text size="sm">{bookingData.durationMinutes} minutes</Text>
+          <Box style={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              style={{ 
+                width: 50,
+                height: 50,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #6E58FF 0%, #8976FF 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 24,
+                boxShadow: '0 4px 12px rgba(110, 88, 255, 0.25)'
+              }}
+            >
+              <IconCalendarEvent size={26} color="white" stroke={1.5} />
+            </Box>
+            <Box>
+              <Title order={3} style={{ marginBottom: 8, fontWeight: 600 }}>
+                {bookingData.subject}
+              </Title>
+              <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconClock size={16} style={{ color: '#6E58FF' }} />
+                <Text size="sm" style={{ color: 'rgba(0,0,0,0.7)' }}>
+                  {bookingData.durationMinutes} minutes
+                </Text>
+              </Box>
+            </Box>
           </Box>
-        </Box>
+        </Paper>
+
+        <BookingCalendar
+          availableSlots={bookingData.items || []}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          onSelectTimeSlot={handleSelectTimeSlot}
+        />
+
+        <BookingModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          selectedTimeSlot={selectedTimeSlot}
+          bookingData={bookingData}
+          profileName={profileName}
+        />
       </Box>
-
-      <BookingCalendar
-        availableSlots={bookingData.items || []}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        onSelectTimeSlot={handleSelectTimeSlot}
-      />
-
-      <BookingModal
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        selectedTimeSlot={selectedTimeSlot}
-        bookingData={bookingData}
-        profileName={profileName}
-      />
+      
+      {/* Footer with logo and branding */}
+      <Box 
+        mt={40} 
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          padding: '16px 0',
+          borderTop: '1px solid rgba(0,0,0,0.05)'
+        }}
+      >
+        <Image 
+          src="/taptalent_logo.jpg" 
+          alt="TapTalent Logo" 
+          width={30}
+          height={30}
+          style={{ marginRight: 12, borderRadius: '6px' }}
+        />
+        <Text size="sm" style={{ fontWeight: 600, color: '#2A2A2A' }}>
+          TapTalent Calendar
+        </Text>
+      </Box>
     </Container>
   );
 };

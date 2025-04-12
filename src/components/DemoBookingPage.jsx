@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { Container, Title, Text, Paper, Stack, Button, Modal, TextInput, Group, Box, Avatar } from '@mantine/core';
-import { parseISO, addDays, format } from 'date-fns';
+import { Container, Title, Text, Paper, Box, Image } from '@mantine/core';
+import { addDays } from 'date-fns';
 import BookingCalendar from './BookingCalendar';
+import DemoBookingModal from './DemoBookingModal';
 import { IconClock, IconCalendarEvent } from '@tabler/icons-react';
 
 const DemoBookingPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Generate dummy booking data that mimics the API response
   const generateDummyBookingData = () => {
@@ -62,28 +59,21 @@ const DemoBookingPage = () => {
   const handleSelectTimeSlot = (slot) => {
     setSelectedTimeSlot(slot);
     setModalOpen(true);
-    setBookingSuccess(false);
   };
 
-  const handleSchedule = () => {
-    if (!name || !email) return;
-    
-    // Demo booking process with loading state to mimic real API call
-    setBookingLoading(true);
-    
-    setTimeout(() => {
-      setBookingLoading(false);
-      setBookingSuccess(true);
-      
-      // Close modal after showing success
-      setTimeout(() => {
-        setModalOpen(false);
-        setName('');
-        setEmail('');
-        setSelectedTimeSlot(null);
-      }, 2000);
-    }, 1000);
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedTimeSlot(null);
   };
+
+  const handleConfirmBooking = (bookingDetails) => {
+    console.log('Booking confirmed:', bookingDetails);
+    // In a real app, this would handle form submission to your API
+  };
+
+  // CSS variables for gradient
+  const primaryGradient = 'linear-gradient(135deg, #6E58FF 0%, #8976FF 100%)';
+  const secondaryGradient = 'linear-gradient(135deg, rgba(110, 88, 255, 0.05) 0%, rgba(137, 118, 255, 0.08) 100%)';
 
   return (
     <Container 
@@ -91,116 +81,90 @@ const DemoBookingPage = () => {
       py="xl" 
       style={{
         maxWidth: '1100px',
+        minHeight: 'calc(100vh - 120px)', // Leave room for footer
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* Header with meeting info */}
-      <Box mb="xl" style={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar 
-          size="xl" 
-          radius="xl" 
-          color="blue" 
-          style={{ marginRight: 24 }}
+      <Box style={{ flex: 1 }}>
+        {/* Meeting information */}
+        <Paper
+          p="xl"
+          radius="md"
+          mb="xl"
+          style={{
+            background: secondaryGradient,
+            border: '1px solid rgba(110, 88, 255, 0.1)',
+          }}
         >
-          <IconCalendarEvent size={32} />
-        </Avatar>
-        <Box>
-          <Title order={1} size="h3" style={{ marginBottom: 8 }}>{dummyBookingData.subject}</Title>
-          <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <IconClock size={16} style={{ color: 'var(--mantine-color-gray-6)' }} />
-            <Text c="dimmed" size="sm">{dummyBookingData.durationMinutes} minutes</Text>
+          <Box style={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              style={{ 
+                width: 50,
+                height: 50,
+                borderRadius: 12,
+                background: primaryGradient,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 24,
+                boxShadow: '0 4px 12px rgba(110, 88, 255, 0.25)'
+              }}
+            >
+              <IconCalendarEvent size={26} color="white" stroke={1.5} />
+            </Box>
+            <Box>
+              <Title order={3} style={{ marginBottom: 8, fontWeight: 600 }}>
+                {dummyBookingData.subject}
+              </Title>
+              <Box style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconClock size={16} style={{ color: '#6E58FF' }} />
+                <Text size="sm" style={{ color: 'rgba(0,0,0,0.7)' }}>
+                  {dummyBookingData.durationMinutes} minutes
+                </Text>
+              </Box>
+            </Box>
           </Box>
-        </Box>
+        </Paper>
+
+        <BookingCalendar
+          availableSlots={dummyBookingData.items || []}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          onSelectTimeSlot={handleSelectTimeSlot}
+        />
+
+        <DemoBookingModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          selectedTimeSlot={selectedTimeSlot}
+          bookingData={dummyBookingData}
+          onConfirm={handleConfirmBooking}
+        />
       </Box>
-
-      <BookingCalendar
-        availableSlots={dummyBookingData.items || []}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        onSelectTimeSlot={handleSelectTimeSlot}
-      />
-
-      <Modal 
-        opened={modalOpen} 
-        onClose={() => setModalOpen(false)}
-        title="Complete your booking"
-        size="md"
-        radius="md"
-        styles={{
-          title: {
-            fontWeight: 700,
-            fontSize: 'var(--mantine-font-size-lg)',
-          }
+      
+      {/* Footer with logo and branding */}
+      <Box 
+        mt={40} 
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          padding: '16px 0',
+          borderTop: '1px solid rgba(0,0,0,0.05)'
         }}
       >
-        {selectedTimeSlot && (
-          <Stack gap="md">
-            {bookingSuccess ? (
-              <Box style={{ padding: '20px 0', textAlign: 'center' }}>
-                <Avatar color="green" size="xl" radius="xl" mx="auto" mb="md">
-                  <IconCalendarEvent size={32} />
-                </Avatar>
-                <Title order={3} size="h4" mb="xs">Meeting scheduled successfully!</Title>
-                <Text c="dimmed" size="sm">A confirmation has been sent to your email</Text>
-              </Box>
-            ) : (
-              <>
-                <Paper p="md" radius="md" withBorder mb="md">
-                  <Stack gap="xs">
-                    <Box>
-                      <Text size="sm" fw={500} c="dimmed">Meeting</Text>
-                      <Text fw={600}>{dummyBookingData.subject}</Text>
-                    </Box>
-                    <Box>
-                      <Text size="sm" fw={500} c="dimmed">Date & Time</Text>
-                      <Text>{format(parseISO(selectedTimeSlot.start), 'EEEE, MMMM d, yyyy')} at {format(parseISO(selectedTimeSlot.start), 'h:mm a')}</Text>
-                    </Box>
-                    <Box>
-                      <Text size="sm" fw={500} c="dimmed">Duration</Text>
-                      <Text>{dummyBookingData.durationMinutes} minutes</Text>
-                    </Box>
-                  </Stack>
-                </Paper>
-                
-                <TextInput
-                  label="Your Name"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={bookingLoading}
-                />
-                
-                <TextInput
-                  label="Email Address"
-                  placeholder="Enter your email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={bookingLoading}
-                />
-                
-                <Group justify="flex-end" mt="md">
-                  <Button 
-                    variant="subtle" 
-                    onClick={() => setModalOpen(false)}
-                    disabled={bookingLoading}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleSchedule}
-                    disabled={!name || !email || bookingLoading}
-                    loading={bookingLoading}
-                  >
-                    Confirm booking
-                  </Button>
-                </Group>
-              </>
-            )}
-          </Stack>
-        )}
-      </Modal>
+        <Image 
+          src="/taptalent_logo.jpg" 
+          alt="TapTalent Logo" 
+          width={30}
+          height={30}
+          style={{ marginRight: 12, borderRadius: '6px' }}
+        />
+        <Text size="sm" style={{ fontWeight: 600, color: '#2A2A2A' }}>
+          TapTalent Calendar
+        </Text>
+      </Box>
     </Container>
   );
 };
